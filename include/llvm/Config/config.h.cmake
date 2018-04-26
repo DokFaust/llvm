@@ -323,6 +323,9 @@
 /* Define if we have the oprofile JIT-support library */
 #cmakedefine01 LLVM_USE_OPROFILE
 
+/* Define if we have the perf JIT-support library */
+#cmakedefine01 LLVM_USE_PERF
+
 /* LLVM version information */
 #cmakedefine LLVM_VERSION_INFO "${LLVM_VERSION_INFO}"
 

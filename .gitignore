@@ -41,6 +41,7 @@ cscope.out
 autoconf/aclocal.m4
 autoconf/autom4te.cache
 /compile_commands.json
+./D44892.diff
 
 #==============================================================================#
 # Directories to ignore (do not add trailing '/'s, they skip symlinks).
