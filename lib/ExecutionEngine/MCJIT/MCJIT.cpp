@@ -220,8 +220,10 @@ void MCJIT::generateCodeForModule(Module *M) {
   if (Dyld.hasError())
     report_fatal_error(Dyld.getErrorString());
 
-  NotifyObjectEmitted(*LoadedObject.get(), *L);
-
+  // Can't call notifiers yet as relocations have not yet been performed, and
+  // memory hasn't been marked executable.
+  PendingLoadedObjects.push_back(LoadedObject->get());
+  PendingLoadedObjectInfos.push_back(std::move(L));
   Buffers.push_back(std::move(ObjectToLoad));
   LoadedObjects.push_back(std::move(*LoadedObject));
 
@@ -241,6 +243,16 @@ void MCJIT::finalizeLoadedModules() {
 
   // Set page permissions.
   MemMgr->finalizeMemory();
+
+  // Notify listeners about loaded objects now that memory is marked executable
+  // and relocations have been performed.
+  for (size_t i = 0; i < PendingLoadedObjects.size(); i++) {
+    auto &Obj = PendingLoadedObjects[i];
+    auto &Info = PendingLoadedObjectInfos[i];
+    NotifyObjectEmitted(*Obj, *Info);
+  }
+  PendingLoadedObjects.clear();
+  PendingLoadedObjectInfos.clear();
 }
 
 // FIXME: Rename this.

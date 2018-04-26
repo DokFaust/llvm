@@ -190,6 +190,8 @@ class MCJIT : public ExecutionEngine {
   SmallVector<std::unique_ptr<MemoryBuffer>, 2> Buffers;
 
   SmallVector<std::unique_ptr<object::ObjectFile>, 2> LoadedObjects;
+  SmallVector<object::ObjectFile*, 2> PendingLoadedObjects;
+  SmallVector<std::unique_ptr<RuntimeDyld::LoadedObjectInfo>, 2> PendingLoadedObjectInfos;
 
   // An optional ObjectCache to be notified of compiled objects and used to
   // perform lookup of pre-compiled code to avoid re-compilation.
