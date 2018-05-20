@@ -175,6 +175,20 @@ LLVMOrcErrorCode LLVMOrcGetSymbolAddress(LLVMOrcJITStackRef JITStack,
  */
 LLVMOrcErrorCode LLVMOrcDisposeInstance(LLVMOrcJITStackRef JITStack);
 
+/**
+ * Register a JIT Event Listener.
+ *
+ * A NULL listener is ignored.
+ */
+void LLVMOrcRegisterJITEventListener(LLVMOrcJITStackRef JITStack, LLVMJITEventListenerRef L);
+
+/**
+ * Unegister a JIT Event Listener.
+ *
+ * A NULL listener is ignored.
+ */
+void LLVMOrcUnregisterJITEventListener(LLVMOrcJITStackRef JITStack, LLVMJITEventListenerRef L);
+
 #ifdef __cplusplus
 }
 #endif /* extern "C" */

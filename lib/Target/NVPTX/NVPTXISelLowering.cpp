@@ -1248,6 +1248,14 @@ SDValue NVPTXTargetLowering::getSqrtEstimate(SDValue Operand, SelectionDAG &DAG,
   }
 }
 
+bool NVPTXTargetLowering::isNoopAddrSpaceCast(unsigned SrcAS,
+                                               unsigned DestAS) const {
+  assert(SrcAS != DestAS && "Expected different address spaces!");
+
+  return (SrcAS  == ADDRESS_SPACE_GENERIC || SrcAS  > ADDRESS_SPACE_LOCAL) &&
+         (DestAS == ADDRESS_SPACE_GENERIC || DestAS > ADDRESS_SPACE_LOCAL);
+}
+
 SDValue
 NVPTXTargetLowering::LowerGlobalAddress(SDValue Op, SelectionDAG &DAG) const {
   SDLoc dl(Op);

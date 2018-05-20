@@ -135,6 +135,11 @@ typedef struct LLVMOpaqueAttributeRef *LLVMAttributeRef;
 typedef struct LLVMOpaqueDiagnosticInfo *LLVMDiagnosticInfoRef;
 
 /**
+  * @see llvm::JITEventListener
+ */
+typedef struct LLVMOpaqueJITEventListener *LLVMJITEventListenerRef;
+
+/**
  * @}
  */
 
