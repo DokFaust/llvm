@@ -443,8 +443,6 @@ public:
                                const NVPTXSubtarget &STI);
   SDValue LowerOperation(SDValue Op, SelectionDAG &DAG) const override;
 
-  bool isNoopAddrSpaceCast(unsigned SrcAS, unsigned DestAS) const override;
-
   SDValue LowerGlobalAddress(SDValue Op, SelectionDAG &DAG) const;
 
   const char *getTargetNodeName(unsigned Opcode) const override;

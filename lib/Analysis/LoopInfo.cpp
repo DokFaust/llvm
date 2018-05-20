@@ -222,14 +222,15 @@ MDNode *Loop::getLoopID() const {
     BasicBlock *H = getHeader();
     for (BasicBlock *BB : this->blocks()) {
       TerminatorInst *TI = BB->getTerminator();
+      MDNode *MD = nullptr;
 
       // Check if this terminator branches to the loop header.
-      bool IsPredecessor = any_of(TI->successors(),
-        [=](BasicBlock *Successor) { return Successor == H; });
-      if (!IsPredecessor)
-        continue;
-
-      MDNode *MD = TI->getMetadata(LLVMContext::MD_loop);
+      for (BasicBlock *Successor : TI->successors()) {
+        if (Successor == H) {
+          MD = TI->getMetadata(LLVMContext::MD_loop);
+          break;
+        }
+      }
       if (!MD)
         return nullptr;
 

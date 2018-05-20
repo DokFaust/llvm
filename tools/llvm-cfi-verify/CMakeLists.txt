@@ -11,7 +11,7 @@ set(LLVM_LINK_COMPONENTS
   Symbolize
   )
 
-add_llvm_tool(llvm-cfi-verify DISABLE_LLVM_LINK_LLVM_DYLIB
+add_llvm_tool(llvm-cfi-verify
   llvm-cfi-verify.cpp)
 
 add_subdirectory(lib)
