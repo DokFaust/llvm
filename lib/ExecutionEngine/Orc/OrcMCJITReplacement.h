@@ -176,7 +176,7 @@ public:
                                                         std::move(MemMgr))),
         Resolver(std::make_shared<LinkingResolver>(*this)),
         ClientResolver(std::move(ClientResolver)), NotifyObjectLoaded(*this),
-        NotifyFinalized(*this),
+        NotifyFinalized(*this), NotifyFreed(*this),
         ObjectLayer([this]() { return this->MemMgr; }, NotifyObjectLoaded,
                     NotifyFinalized),
         CompileLayer(ObjectLayer, SimpleCompiler(*this->TM)),

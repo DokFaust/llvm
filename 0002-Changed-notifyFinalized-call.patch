@@ -1,0 +1,25 @@
+From 55734a0ba472ceedb6cfbad7a2b2d472529bc31a Mon Sep 17 00:00:00 2001
+From: DokFaust <rodia@autistici.org>
+Date: Sun, 27 May 2018 22:45:36 +0200
+Subject: [PATCH 2/3] Changed notifyFinalized call
+
+---
+ include/llvm/ExecutionEngine/Orc/RTDyldObjectLinkingLayer.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/llvm/ExecutionEngine/Orc/RTDyldObjectLinkingLayer.h b/include/llvm/ExecutionEngine/Orc/RTDyldObjectLinkingLayer.h
+index a783fda3761..2a08a05f40d 100644
+--- a/include/llvm/ExecutionEngine/Orc/RTDyldObjectLinkingLayer.h
++++ b/include/llvm/ExecutionEngine/Orc/RTDyldObjectLinkingLayer.h
+@@ -279,7 +279,7 @@ public:
+       RTDyld.finalizeWithMemoryManagerLocking();
+ 
+       if (this->NotifyFinalized)
+-        this->NotifyFinalized(H);
++        this->NotifyFinalized(H, ObjToLoad, *Info);
+     };
+ 
+     auto LO =
+-- 
+2.17.0
+
