@@ -104,7 +104,10 @@ public:
                        const RuntimeDyld::LoadedObjectInfo &)>;
 
   /// @brief Functor for receiving finalization notifications.
-  using NotifyFinalizedFtor = std::function<void(ObjHandleT)>;
+  using NotifyFinalizedFtor = std::function<void(ObjHandleT, const ObjectPtr &Obj,
+                       const RuntimeDyld::LoadedObjectInfo &)>;
+
+  using NotifyFreedFtor = std::function<void(ObjHandleT, const ObjectPtr &Obj)>;
 
 private:
 
@@ -238,10 +241,12 @@ public:
   RTDyldObjectLinkingLayer(
       MemoryManagerGetter GetMemMgr,
       NotifyLoadedFtor NotifyLoaded = NotifyLoadedFtor(),
-      NotifyFinalizedFtor NotifyFinalized = NotifyFinalizedFtor())
+      NotifyFinalizedFtor NotifyFinalized = NotifyFinalizedFtor(),
+      NotifyFreedFtor NotifyFreed = NotifyFreedFtor())
       : GetMemMgr(GetMemMgr),
         NotifyLoaded(std::move(NotifyLoaded)),
         NotifyFinalized(std::move(NotifyFinalized)),
+        NotifyFreed(std::move(NotifyFreed)),
         ProcessAllSections(false) {}
 
   /// @brief Set the 'ProcessAllSections' flag.
@@ -350,6 +355,7 @@ private:
   MemoryManagerGetter GetMemMgr;
   NotifyLoadedFtor NotifyLoaded;
   NotifyFinalizedFtor NotifyFinalized;
+  NotifyFreedFtor NotifyFreed;
   bool ProcessAllSections = false;
 };
 
