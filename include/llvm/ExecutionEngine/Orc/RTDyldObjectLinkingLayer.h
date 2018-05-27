@@ -279,7 +279,7 @@ public:
       RTDyld.finalizeWithMemoryManagerLocking();
 
       if (this->NotifyFinalized)
-        this->NotifyFinalized(H);
+        this->NotifyFinalized(H, ObjToLoad, *Info);
     };
 
     auto LO =
