@@ -1,0 +1,26 @@
+From e8efe3d65913fdb190ba116cb45fab9b4fb3c635 Mon Sep 17 00:00:00 2001
+From: DokFaust <rodia@autistici.org>
+Date: Sun, 27 May 2018 22:48:04 +0200
+Subject: [PATCH 3/5] Match .gitignore with julia-master branch
+
+---
+ .gitignore | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/.gitignore b/.gitignore
+index 81c2ad4e059..555789977b5 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -24,9 +24,6 @@
+ # Nested build directory
+ /build
+ 
+-#Julia patches
+-patches/
+-
+ #Patch and diffs left around
+ *.diff
+ 
+-- 
+2.17.0
+

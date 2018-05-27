@@ -176,7 +176,7 @@ public:
                                                         std::move(MemMgr))),
         Resolver(std::make_shared<LinkingResolver>(*this)),
         ClientResolver(std::move(ClientResolver)), NotifyObjectLoaded(*this),
-        NotifyFinalized(*this), NotifyFreed(*this),
+        NotifyFinalized(*this),
         ObjectLayer([this]() { return this->MemMgr; }, NotifyObjectLoaded,
                     NotifyFinalized),
         CompileLayer(ObjectLayer, SimpleCompiler(*this->TM)),
@@ -354,7 +354,8 @@ private:
   public:
     NotifyFinalizedT(OrcMCJITReplacement &M) : M(M) {}
 
-    void operator()(RTDyldObjectLinkingLayerBase::ObjHandleT H) {
+    void operator()(RTDyldObjectLinkingLayerBase::ObjHandleT H, const object::ObjectFile &Obj,
+                    const RuntimeDyld::LoadedObjectInfo &Info) {
       M.UnfinalizedSections.erase(H);
     }
 

@@ -1,0 +1,65 @@
+From 05c38f7771fc871ee89996f1ab7f2787a3f117b0 Mon Sep 17 00:00:00 2001
+From: DokFaust <rodia@autistici.org>
+Date: Sun, 27 May 2018 21:54:37 +0200
+Subject: [PATCH 1/5] Create OrcJIT callbacks
+
+---
+ .gitignore                                             |  3 +++
+ .../ExecutionEngine/Orc/RTDyldObjectLinkingLayer.h     | 10 ++++++++--
+ 2 files changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/.gitignore b/.gitignore
+index ecf66cb6368..81c2ad4e059 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -27,6 +27,9 @@
+ #Julia patches
+ patches/
+ 
++#Patch and diffs left around
++*.diff
++
+ #==============================================================================#
+ # Explicit files to ignore (only matches one).
+ #==============================================================================#
+diff --git a/include/llvm/ExecutionEngine/Orc/RTDyldObjectLinkingLayer.h b/include/llvm/ExecutionEngine/Orc/RTDyldObjectLinkingLayer.h
+index 246c57341f3..a783fda3761 100644
+--- a/include/llvm/ExecutionEngine/Orc/RTDyldObjectLinkingLayer.h
++++ b/include/llvm/ExecutionEngine/Orc/RTDyldObjectLinkingLayer.h
+@@ -104,7 +104,10 @@ public:
+                        const RuntimeDyld::LoadedObjectInfo &)>;
+ 
+   /// @brief Functor for receiving finalization notifications.
+-  using NotifyFinalizedFtor = std::function<void(ObjHandleT)>;
++  using NotifyFinalizedFtor = std::function<void(ObjHandleT, const ObjectPtr &Obj,
++                       const RuntimeDyld::LoadedObjectInfo &)>;
++
++  using NotifyFreedFtor = std::function<void(ObjHandleT, const ObjectPtr &Obj)>;
+ 
+ private:
+ 
+@@ -238,10 +241,12 @@ public:
+   RTDyldObjectLinkingLayer(
+       MemoryManagerGetter GetMemMgr,
+       NotifyLoadedFtor NotifyLoaded = NotifyLoadedFtor(),
+-      NotifyFinalizedFtor NotifyFinalized = NotifyFinalizedFtor())
++      NotifyFinalizedFtor NotifyFinalized = NotifyFinalizedFtor(),
++      NotifyFreedFtor NotifyFreed = NotifyFreedFtor())
+       : GetMemMgr(GetMemMgr),
+         NotifyLoaded(std::move(NotifyLoaded)),
+         NotifyFinalized(std::move(NotifyFinalized)),
++        NotifyFreed(std::move(NotifyFreed)),
+         ProcessAllSections(false) {}
+ 
+   /// @brief Set the 'ProcessAllSections' flag.
+@@ -350,6 +355,7 @@ private:
+   MemoryManagerGetter GetMemMgr;
+   NotifyLoadedFtor NotifyLoaded;
+   NotifyFinalizedFtor NotifyFinalized;
++  NotifyFreedFtor NotifyFreed;
+   bool ProcessAllSections = false;
+ };
+ 
+-- 
+2.17.0
+
