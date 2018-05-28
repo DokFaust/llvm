@@ -176,9 +176,9 @@ public:
                                                         std::move(MemMgr))),
         Resolver(std::make_shared<LinkingResolver>(*this)),
         ClientResolver(std::move(ClientResolver)), NotifyObjectLoaded(*this),
-        NotifyFinalized(*this),
+        NotifyFinalized(*this), 
         ObjectLayer([this]() { return this->MemMgr; }, NotifyObjectLoaded,
-                    NotifyFinalized),
+                    NotifyFinalized, NotifyFreed),
         CompileLayer(ObjectLayer, SimpleCompiler(*this->TM)),
         LazyEmitLayer(CompileLayer) {}
 
@@ -390,6 +390,8 @@ private:
 
   NotifyObjectLoadedT NotifyObjectLoaded;
   NotifyFinalizedT NotifyFinalized;
+  using NotifyFreedT = RTDyldObjectLinkingLayer::NotifyFreedFtor;
+  NotifyFreedT NotifyFreed;
 
   ObjectLayerT ObjectLayer;
   CompileLayerT CompileLayer;
