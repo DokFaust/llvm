@@ -14,6 +14,8 @@
 
 #include "llvm/CodeGen/MachineFunction.h"
 #include "llvm/Config/config.h"
+#include "llvm/DebugInfo/DIContext.h"
+#include "llvm/DebugInfo/DWARF/DWARFContext.h"
 #include "llvm/ExecutionEngine/JITEventListener.h"
 #include "llvm/ExecutionEngine/OProfileWrapper.h"
 #include "llvm/ExecutionEngine/RuntimeDyld.h"
@@ -84,10 +86,12 @@ void OProfileJITEventListener::NotifyObjectEmitted(
 
   OwningBinary<ObjectFile> DebugObjOwner = L.getObjectForDebug(Obj);
   const ObjectFile &DebugObj = *DebugObjOwner.getBinary();
+  std::unique_ptr<DIContext> Context = DWARFContext::create(DebugObj);
 
   // Use symbol info to iterate functions in the object.
   for (const std::pair<SymbolRef, uint64_t> &P : computeSymbolSizes(DebugObj)) {
     SymbolRef Sym = P.first;
+    std::string SourceFileName;
     if (!Sym.getType() || *Sym.getType() != SymbolRef::ST_Function)
       continue;
 
@@ -108,7 +112,29 @@ void OProfileJITEventListener::NotifyObjectEmitted(
                    << "]\n");
       continue;
     }
-    // TODO: support line number info (similar to IntelJITEventListener.cpp)
+    DILineInfoTable Lines = Context->getLineInfoForAddressRange(Addr, Size);
+    DILineInfoTable::iterator Begin = Lines.begin();
+    DILineInfoTable::iterator End = Lines.end();
+    size_t i = 0;
+
+    size_t num_entries = std::distance(Begin, End);
+    static struct debug_line_info* debug_line;
+    debug_line = (struct debug_line_info * )calloc(num_entries, sizeof(struct debug_line_info));
+
+    for(DILineInfoTable::iterator It=Begin; It != End; ++It){
+        i = std::distance(Begin,It);
+        debug_line[i].vma = (unsigned long) It->first;
+        debug_line[i].lineno = It->second.Line;
+        SourceFileName = Lines.front().second.FileName;
+        debug_line[i].filename = const_cast<char *>(SourceFileName.c_str());
+    }
+
+    if(Wrapper->op_write_debug_line_info((void*) Addr, num_entries, debug_line) == -1) {
+        DEBUG(dbgs() << "Failed to tell OProfiler about debug object at ["
+                     << (void*) Addr << "-" << ((char *) Addr + Size)
+                     <<  "]\n");
+        continue;
+    }
   }
 
   DebugObjects[Obj.getData().data()] = std::move(DebugObjOwner);
