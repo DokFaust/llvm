@@ -86,7 +86,6 @@ void OProfileJITEventListener::NotifyObjectEmitted(
   OwningBinary<ObjectFile> DebugObjOwner = L.getObjectForDebug(Obj);
   const ObjectFile &DebugObj = *DebugObjOwner.getBinary();
   std::unique_ptr<DIContext> Context = DWARFContext::create(DebugObj);
-  std::string SourceFileName;
 
   // Use symbol info to iterate functions in the object.
   for (const std::pair<SymbolRef, uint64_t> &P : computeSymbolSizes(DebugObj)) {
@@ -112,21 +111,19 @@ void OProfileJITEventListener::NotifyObjectEmitted(
       continue;
     }
     DILineInfoTable Lines = Context->getLineInfoForAddressRange(Addr, Size);
-    DILineInfoTable::iterator Begin = Lines.begin();
-    DILineInfoTable::iterator End = Lines.end();
     size_t i = 0;
 
-    size_t num_entries = std::distance(Begin, End);
-    static struct debug_line_info *debug_line;
+    size_t num_entries = Lines.size();
+    struct debug_line_info *debug_line;
     debug_line = (struct debug_line_info *)calloc(
         num_entries, sizeof(struct debug_line_info));
 
-    for (DILineInfoTable::iterator It = Begin; It != End; ++It) {
-      i = std::distance(Begin, It);
-      debug_line[i].vma = (unsigned long)It->first;
-      debug_line[i].lineno = It->second.Line;
-      SourceFileName = Lines.front().second.FileName;
-      debug_line[i].filename = const_cast<char *>(SourceFileName.c_str());
+    for (auto& It : Lines) {
+      debug_line[i].vma = (unsigned long)It.first;
+      debug_line[i].lineno = It.second.Line;
+      debug_line[i].filename =
+          const_cast<char *>(Lines.front().second.FileName.c_str());
+      ++i;
     }
 
     if (Wrapper->op_write_debug_line_info((void *)Addr, num_entries,
